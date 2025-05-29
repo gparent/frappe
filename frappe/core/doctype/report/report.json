@@ -17,6 +17,7 @@
   "add_total_row",
   "disabled",
   "prepared_report",
+  "prepared_report_threshold",
   "add_translate_data",
   "timeout",
   "filters_section",
@@ -202,12 +203,20 @@
    "fieldname": "add_translate_data",
    "fieldtype": "Check",
    "label": "Add Translate Data"
+  },
+  {
+   "default": "15",
+   "description": "Specify a number of seconds before reports are automatically turned into Prepared Reports.",
+   "fieldname": "prepared_report_threshold",
+   "fieldtype": "Int",
+   "label": "Prepared Report Threshold (In Seconds)"
   }
  ],
+ "grid_page_length": 50,
  "idx": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-12 17:08:09.629411",
+ "modified": "2025-05-29 09:31:53.633448",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "Report",
