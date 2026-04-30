@@ -50,6 +50,7 @@ def download_multi_pdf_async(
 	no_letterhead: bool = False,
 	letterhead: str | None = None,
 	options: str | None = None,
+	language: str | None = None,
 ):
 	"""
 	Calls _download_multi_pdf with the given parameters in a background job, returns task ID
@@ -72,6 +73,7 @@ def download_multi_pdf_async(
 		no_letterhead=no_letterhead,
 		letterhead=letterhead,
 		options=options,
+		language=language or frappe.local.lang,
 		queue="long" if doc_count > 20 else "short",
 		at_front_when_starved=True,
 	)
@@ -87,6 +89,7 @@ def _download_multi_pdf(
 	letterhead: str | None = None,
 	options: str | None = None,
 	task_id: str | None = None,
+	language: str | None = None,
 ):
 	"""Return a PDF compiled by concatenating multiple documents.
 
@@ -135,16 +138,17 @@ def _download_multi_pdf(
 		# Concatenating pdf files
 		for idx, ss in enumerate(result):
 			try:
-				pdf_writer = frappe.get_print(
-					doctype,
-					ss,
-					format,
-					as_pdf=True,
-					output=pdf_writer,
-					no_letterhead=no_letterhead,
-					letterhead=letterhead,
-					pdf_options=options,
-				)
+				with print_language(language):
+					pdf_writer = frappe.get_print(
+						doctype,
+						ss,
+						format,
+						as_pdf=True,
+						output=pdf_writer,
+						no_letterhead=no_letterhead,
+						letterhead=letterhead,
+						pdf_options=options,
+					)
 			except Exception:
 				if task_id:
 					frappe.publish_realtime(task_id=task_id, message={"message": "Failed"})
@@ -172,16 +176,17 @@ def _download_multi_pdf(
 			filename += f"{doctype_name}_"
 			for doc_name in doctype[doctype_name]:
 				try:
-					pdf_writer = frappe.get_print(
-						doctype_name,
-						doc_name,
-						format,
-						as_pdf=True,
-						output=pdf_writer,
-						no_letterhead=no_letterhead,
-						letterhead=letterhead,
-						pdf_options=options,
-					)
+					with print_language(language):
+						pdf_writer = frappe.get_print(
+							doctype_name,
+							doc_name,
+							format,
+							as_pdf=True,
+							output=pdf_writer,
+							no_letterhead=no_letterhead,
+							letterhead=letterhead,
+							pdf_options=options,
+						)
 				except Exception:
 					if task_id:
 						frappe.publish_realtime(task_id=task_id, message="Failed")
